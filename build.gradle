@@ -1,0 +1,38 @@
+plugins {
+    id 'java'
+    id 'com.diffplug.spotless' version '8.1.0'
+}
+
+group = 'com.bancodigital'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly "org.projectlombok:lombok:1.18.42"
+    annotationProcessor "org.projectlombok:lombok:1.18.42"
+
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+spotless {
+    java {
+        // Usa el formateador oficial de Google
+        googleJavaFormat('1.32.0')
+        // Aplica a todos los archivos Java en src
+        target 'src/**/*.java'
+    }
+
+    format 'misc', {
+        // Aplica Prettier a archivos auxiliares
+        target '*.md', '*.json', '*.yaml'
+        prettier()
+    }
+}
