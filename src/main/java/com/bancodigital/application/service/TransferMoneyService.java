@@ -4,6 +4,8 @@ import com.bancodigital.application.ports.input.TransferMoneyUseCase;
 import com.bancodigital.application.ports.output.AccountRepository;
 import com.bancodigital.application.ports.output.TransactionRepository;
 import com.bancodigital.domain.model.Account;
+import com.bancodigital.domain.model.EstadoTransaccion;
+import com.bancodigital.domain.model.TipoTransaccion;
 import com.bancodigital.domain.model.Transaction;
 
 public class TransferMoneyService implements TransferMoneyUseCase {
@@ -55,8 +57,8 @@ public class TransferMoneyService implements TransferMoneyUseCase {
             .cuentaDestinoId(cuentaDestinoId)
             .monto(monto)
             .comision(comision)
-            .tipo("TRANSFERENCIA")
-            .estado("COMPLETADA")
+            .tipoTransacion(TipoTransaccion.TRANSFERENCIA)
+            .estadoTransaccion(EstadoTransaccion.COMPLETADA)
             .descripcion(descripcion)
             .fechaCreacion(java.time.LocalDateTime.now())
             .build();

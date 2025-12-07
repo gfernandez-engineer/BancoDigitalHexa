@@ -1,19 +1,25 @@
 package com.bancodigital;
 
-// TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+import com.bancodigital.application.ports.input.CheckBalanceUseCase;
+import com.bancodigital.application.ports.input.CreateAccountUseCase;
+import com.bancodigital.application.service.CheckBalanceService;
+import com.bancodigital.application.service.CreateAccountService;
+import com.bancodigital.infrastructure.adapters.input.ConsoleInputAdapter;
+import com.bancodigital.infrastructure.adapters.output.AccountRepositoryInMemory;
+import com.bancodigital.infrastructure.adapters.output.ConsoleNotificationAdapter;
+
 public class Main {
   public static void main(String[] args) {
-    // TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-    // to see how IntelliJ IDEA suggests fixing it.
-    System.out.printf("Hello and welcome!");
+    // Adaptadores de salida
+    AccountRepositoryInMemory accountRepo = new AccountRepositoryInMemory();
+    ConsoleNotificationAdapter notifier = new ConsoleNotificationAdapter();
 
-    for (int i = 1; i <= 5; i++) {
-      // TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon
-      // src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-      // for you, but you can always add more by pressing <shortcut
-      // actionId="ToggleLineBreakpoint"/>.
-      System.out.println("i = " + i);
-    }
+    // Servicios (casos de uso)
+    CreateAccountUseCase createAccountService = new CreateAccountService(accountRepo, notifier);
+    CheckBalanceUseCase checkBalanceService = new CheckBalanceService(accountRepo);
+
+    // Adaptador de entrada
+    ConsoleInputAdapter consoleAdapter = new ConsoleInputAdapter(createAccountService, checkBalanceService);
+    consoleAdapter.start();
   }
 }

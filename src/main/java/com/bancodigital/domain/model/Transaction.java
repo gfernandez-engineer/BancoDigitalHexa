@@ -11,14 +11,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Transaction {
-  private String transaccionId;     // PK de la transacción (UUID)
+  private String transaccionId; // PK de la transacción (UUID)
   private String cuentaOrigenId; // FK
   private String cuentaDestinoId; // FK
   private double monto;
   private double comision;
-  private TipoTransaccion tipoTransacion;  // Enum
-  private EstadoTransaccion estadoTransaccion;          //Enum
-  private String descripcion;     // Texto libre
+  private TipoTransaccion tipoTransacion; // Enum
+  private EstadoTransaccion estadoTransaccion; // Enum
+  private String descripcion; // Texto libre
   private LocalDateTime fechaCreacion;
 
   public void validar() {

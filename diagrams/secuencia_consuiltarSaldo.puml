@@ -1,0 +1,17 @@
+@startuml
+title Caso de Uso: Consultar Saldo
+
+actor Usuario
+
+participant "ConsoleInputAdapter" as CLI
+participant "CheckBalanceService" as CheckBalance
+participant "AccountRepositoryInMemory" as AccountRepo
+
+Usuario -> CLI: Ingresar número de cuenta
+CLI -> CheckBalance: consultarSaldoPorNumeroCuenta(numeroCuenta)
+CheckBalance -> AccountRepo: findByNumeroCuenta(numeroCuenta)
+AccountRepo --> CheckBalance: Account
+CheckBalance --> CLI: saldo
+CLI --> Usuario: "Saldo actual: saldo"
+
+@enduml
