@@ -1,0 +1,20 @@
+@startuml
+title Caso de Uso: Crear Cuenta
+
+actor Usuario
+
+participant "ConsoleInputAdapter" as CLI
+participant "CreateAccountService" as CreateAccount
+participant "AccountRepositoryInMemory" as AccountRepo
+participant "ConsoleNotificationAdapter" as Notifier
+
+Usuario -> CLI: Ingresar clientId, número de cuenta, saldo inicial
+CLI -> CreateAccount: crear(clientId, numeroCuenta, saldoInicial)
+CreateAccount -> AccountRepo: save(Account)
+AccountRepo --> CreateAccount: Account creado
+CreateAccount -> Notifier: notificar("Cuenta creada")
+Notifier --> CreateAccount: confirmación
+CreateAccount --> CLI: accountId
+CLI --> Usuario: "Cuenta creada con ID: accountId"
+
+@enduml

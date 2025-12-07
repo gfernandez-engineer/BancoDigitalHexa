@@ -1,0 +1,25 @@
+@startuml
+title Caso de Uso: Transferir Dinero
+
+actor Usuario
+
+participant "ConsoleInputAdapter" as CLI
+participant "TransferMoneyService" as TransferMoney
+participant "AccountRepositoryInMemory" as AccountRepo
+participant "TransactionRepositoryInMemory" as TxRepo
+participant "ConsoleNotificationAdapter" as Notifier
+
+Usuario -> CLI: Ingresar cuenta origen, cuenta destino, monto
+CLI -> TransferMoney: transferir(origen, destino, monto)
+TransferMoney -> AccountRepo: findByNumeroCuenta(origen)
+AccountRepo --> TransferMoney: Account origen
+TransferMoney -> AccountRepo: findByNumeroCuenta(destino)
+AccountRepo --> TransferMoney: Account destino
+TransferMoney -> TxRepo: save(Transaction)
+TxRepo --> TransferMoney: confirmación
+TransferMoney -> Notifier: notificar("Transferencia realizada")
+Notifier --> TransferMoney: confirmación
+TransferMoney --> CLI: resultado
+CLI --> Usuario: "Transferencia exitosa"
+
+@enduml

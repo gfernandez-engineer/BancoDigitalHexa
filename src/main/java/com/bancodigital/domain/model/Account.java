@@ -2,6 +2,7 @@ package com.bancodigital.domain.model;
 
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,14 +16,26 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Account {
-  private String cuentaId; // PK de la cuenta
-  private String clienteId; // FK al cliente
+  private String accountId; // PK de la cuenta
+  private String clientId; // FK al cliente
   private String numeroCuenta; // número legible/único
   private double saldo; // Saldo actual
-  private String estado; // ACTIVO,CERRADO
+  private EstadoCuenta estado; // ACTIVO,CERRADO
   private LocalDateTime fechaCreacion;
   private LocalDateTime fechaActualizacion;
+
+  public Account(
+      String accountId, String clientId, String numeroCuenta, double saldo, EstadoCuenta estado) {
+    this.accountId = accountId;
+    this.clientId = clientId;
+    this.numeroCuenta = numeroCuenta;
+    this.saldo = saldo;
+    this.estado = estado;
+    this.fechaCreacion = java.time.LocalDateTime.now();
+    this.fechaActualizacion = java.time.LocalDateTime.now();
+  }
 
   public void depositar(double monto) {
     if (monto <= 0) {
@@ -36,7 +49,7 @@ public class Account {
     if (monto <= 0) {
       throw new IllegalArgumentException("Monto inválido");
     }
-    if (!"ACTIVO".equalsIgnoreCase(this.estado)) {
+    if (estado != EstadoCuenta.ACTIVO) {
       throw new IllegalStateException("La cuenta no está activa");
     }
     if (this.saldo < monto) {
@@ -46,7 +59,7 @@ public class Account {
     this.fechaActualizacion = LocalDateTime.now();
   }
 
-  public void cambiarEstado(String nuevoEstado) {
+  public void cambiarEstado(EstadoCuenta nuevoEstado) {
     this.estado = nuevoEstado;
     this.fechaActualizacion = LocalDateTime.now();
   }
