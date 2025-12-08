@@ -1,0 +1,25 @@
+@startuml
+title Caso de Uso: Notificar por Email
+
+actor Sistema as App
+
+participant "NotificationPort" as Notification
+participant "EmailNotificationAdapter" as EmailAdapter
+participant "ExternalEmailService" as ExternalService
+
+note over App: El caso de uso necesita enviar una notificación por correo
+
+App -> Notification: notificar("Cuenta creada / Transferencia realizada")
+note right of Notification: El dominio invoca el puerto de salida\nsin conocer la implementación concreta
+
+Notification -> EmailAdapter: notificar(mensaje)
+note right of EmailAdapter: El adaptador traduce la llamada del puerto\nhacia el servicio externo
+
+EmailAdapter -> ExternalService: sendEmail(mensaje)
+ExternalService --> EmailAdapter: confirmación
+
+EmailAdapter --> Notification: confirmación
+Notification --> App: notificación enviada
+
+note over App: El caso de uso recibe confirmación\nsin depender de la tecnología externa
+@enduml

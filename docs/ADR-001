@@ -1,0 +1,27 @@
+# ADR-001: Uso de Arquitectura Hexagonal
+
+## Estado
+Aceptado
+
+## Fecha
+2025-12-08
+
+## Contexto
+El sistema Banco Digital requiere una arquitectura que permita desacoplar el núcleo de negocio de los detalles tecnológicos. Se busca flexibilidad para intercambiar adaptadores de entrada (consola, REST) y salida (repositorios, notificaciones) sin modificar los casos de uso.
+
+## Decisión
+Adoptar arquitectura hexagonal (Ports & Adapters) como base del diseño.
+
+## Alternativas Consideradas
+1. Arquitectura en capas tradicional (Controller-Service-Repository)
+2. Arquitectura Hexagonal - **ELEGIDA**
+
+## Consecuencias
+### Positivas
+- Núcleo de negocio independiente de frameworks y tecnologías externas.
+- Facilidad para intercambiar adaptadores (ej. consola ↔ REST, memoria ↔ BD real).
+- Favorece pruebas unitarias y automatizadas.
+
+### Negativas
+- Mayor complejidad inicial para devcolpers.
+- Requiere disciplina en la separación de paquetes y dependencias.

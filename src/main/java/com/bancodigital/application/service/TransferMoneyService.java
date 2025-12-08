@@ -1,22 +1,27 @@
 package com.bancodigital.application.service;
 
 import com.bancodigital.application.ports.input.TransferMoneyUseCase;
-import com.bancodigital.application.ports.output.AccountRepository;
-import com.bancodigital.application.ports.output.TransactionRepository;
+import com.bancodigital.application.ports.output.AccountRepositoryPort;
+import com.bancodigital.application.ports.output.TransactionRepositoryPort;
 import com.bancodigital.domain.model.Account;
 import com.bancodigital.domain.model.EstadoTransaccion;
 import com.bancodigital.domain.model.TipoTransaccion;
 import com.bancodigital.domain.model.Transaction;
+import com.bancodigital.domain.strategy.CommissionStrategy;
 
 public class TransferMoneyService implements TransferMoneyUseCase {
 
-  private final AccountRepository accountRepository;
-  private final TransactionRepository transactionRepository;
+  private final AccountRepositoryPort accountRepositoryPort;
+  private final TransactionRepositoryPort transactionRepositoryPort;
+  private final CommissionStrategy commissionStrategy; // estrategia inyectada
 
   public TransferMoneyService(
-      AccountRepository accountRepository, TransactionRepository transactionRepository) {
-    this.accountRepository = accountRepository;
-    this.transactionRepository = transactionRepository;
+      AccountRepositoryPort accountRepositoryPort,
+      TransactionRepositoryPort transactionRepositoryPort,
+      CommissionStrategy commissionStrategy) {
+    this.accountRepositoryPort = accountRepositoryPort;
+    this.transactionRepositoryPort = transactionRepositoryPort;
+    this.commissionStrategy = commissionStrategy;
   }
 
   @Override
@@ -26,28 +31,41 @@ public class TransferMoneyService implements TransferMoneyUseCase {
       double monto,
       double comision,
       String descripcion) {
+
     // cargar entidades
+    // validamos cuenta origen
     Account origen =
-        accountRepository
-            .findById(cuentaOrigenId)
-            .orElseThrow(() -> new IllegalArgumentException("Cuenta origen no encontrada"));
+        accountRepositoryPort
+            .findByNumeroCuenta(cuentaOrigenId)
+            .orElseThrow(
+                () ->
+                    new IllegalArgumentException(
+                        "Cuenta origen '" + cuentaOrigenId + "' no encontrada"));
+
+    // validamos cuenta destino
     Account destino =
-        accountRepository
-            .findById(cuentaDestinoId)
-            .orElseThrow(() -> new IllegalArgumentException("Cuenta destino no encontrada"));
+        accountRepositoryPort
+            .findByNumeroCuenta(cuentaDestinoId)
+            .orElseThrow(
+                () ->
+                    new IllegalArgumentException(
+                        "Cuenta origen '" + cuentaDestinoId + "' no encontrada"));
 
     // validaciones de la aplicación
     if (monto <= 0) throw new IllegalArgumentException("El monto debe ser positivo");
     if (cuentaOrigenId.equals(cuentaDestinoId))
-      throw new IllegalArgumentException("La cuenta origen y detino deben ser diferentes");
+      throw new IllegalArgumentException("La cuenta origen y destino deben ser diferentes");
+
+    // Usar la estrategasia para calcular comisión
+    double comisionCalculada = commissionStrategy.calcularComision(monto);
 
     // regla en entidades
-    origen.retirar(monto + comision); // protege contra saldo negativo
+    origen.retirar(monto + comisionCalculada); // protege contra saldo negativo
     destino.depositar(monto);
 
     // persistir efectos
-    accountRepository.save(origen);
-    accountRepository.save(destino);
+    accountRepositoryPort.save(origen);
+    accountRepositoryPort.save(destino);
 
     // registrar transaccion
     Transaction transaction =
@@ -63,6 +81,6 @@ public class TransferMoneyService implements TransferMoneyUseCase {
             .fechaCreacion(java.time.LocalDateTime.now())
             .build();
 
-    transactionRepository.save(transaction);
+    transactionRepositoryPort.save(transaction);
   }
 }

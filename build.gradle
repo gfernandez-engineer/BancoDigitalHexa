@@ -1,6 +1,12 @@
 plugins {
     id 'java'
+    id 'application'
     id 'com.diffplug.spotless' version '8.1.0'
+}
+
+application {
+    // Ajusta al paquete y clase donde está tu método main
+    mainClass = 'com.bancodigital.Main'
 }
 
 group = 'com.bancodigital'
