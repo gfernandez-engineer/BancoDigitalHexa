@@ -1,10 +1,12 @@
 package com.bancodigital.infrastructure.adapters.output;
 
-import com.bancodigital.application.ports.output.AccountRepository;
+import com.bancodigital.application.ports.output.AccountRepositoryPort;
 import com.bancodigital.domain.model.Account;
+import java.util.List;
 import java.util.Optional;
 
-public class AccountRepositoryJpa implements AccountRepository {
+/** AccountRepositoryJpa → es adaptador del puerto AccountRepositoryPort. */
+public class AccountRepositoryJpa implements AccountRepositoryPort {
 
   @Override
   public Optional<Account> findById(String cuentaId) {
@@ -18,4 +20,9 @@ public class AccountRepositoryJpa implements AccountRepository {
 
   @Override
   public void save(Account account) {}
+
+  @Override
+  public List<Account> findAll() {
+    return List.of();
+  }
 }

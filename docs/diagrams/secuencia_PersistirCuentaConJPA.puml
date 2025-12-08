@@ -1,0 +1,37 @@
+@startuml
+title Caso de Uso: Persistir Cuenta con JPA
+
+actor Usuario
+
+participant "ConsoleInputAdapter" as CLI
+participant "CreateAccountService" as CreateAccount
+participant "AccountRepositoryPort" as AccountRepoPort
+participant "AccountRepositoryJpa" as AccountRepoJpa
+database "Base de Datos (H2/MySQL)" as DB
+
+note over Usuario: El usuario solicita crear una nueva cuenta
+
+Usuario -> CLI: Ingresar clientId, número de cuenta, saldo inicial
+note right of CLI: El adaptador de entrada traduce la acción\nhacia el caso de uso
+
+CLI -> CreateAccount: crear(clientId, numeroCuenta, saldoInicial)
+
+note right of CreateAccount: El servicio valida datos y construye\nla entidad Account
+
+CreateAccount -> AccountRepoPort: save(Account)
+note right of AccountRepoPort: El servicio invoca el puerto de salida\nsin conocer la implementación concreta
+
+AccountRepoPort -> AccountRepoJpa: save(Account)
+note right of AccountRepoJpa: El adaptador traduce la llamada hacia\nla base de datos usando JPA
+
+AccountRepoJpa -> DB: INSERT INTO cuentas (...)
+DB --> AccountRepoJpa: confirmación
+
+AccountRepoJpa --> AccountRepoPort: Account creado
+AccountRepoPort --> CreateAccount: confirmación
+
+CreateAccount --> CLI: accountId
+CLI --> Usuario: "Cuenta creada en BD con ID: accountId"
+
+note over Usuario: El usuario recibe confirmación de la creación\npersistida en la base de datos
+@enduml

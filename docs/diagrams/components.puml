@@ -1,0 +1,54 @@
+@startuml
+title BancoDigitalHexa - Diagrama de Componentes (Arquitectura Hexagonal)
+
+package "Adaptadores de Entrada" {
+  [ConsoleInputAdapter] --> (CreateAccountUseCase)
+  [ConsoleInputAdapter] --> (CheckBalanceUseCase)
+  [ConsoleInputAdapter] --> (TransferMoneyUseCase)
+}
+
+package "Aplicación (Casos de Uso)" {
+  (CreateAccountUseCase) <|-- [CreateAccountService]
+  (CheckBalanceUseCase) <|-- [CheckBalanceService]
+  (TransferMoneyUseCase) <|-- [TransferMoneyService]
+}
+
+package "Puertos de Salida" {
+  interface AccountRepositoryPort
+  interface TransactionRepositoryPort
+  interface NotificationPort
+}
+
+package "Adaptadores de Salida" {
+  [AccountRepositoryInMemory] ..|> AccountRepositoryPort
+  [AccountRepositoryJpa] ..|> AccountRepositoryPort
+  [TransactionRepositoryInMemory] ..|> TransactionRepositoryPort
+  [ConsoleNotificationAdapter] ..|> NotificationPort
+  [EmailNotificationAdapter] ..|> NotificationPort
+}
+
+package "Dominio" {
+  [Account]
+  [Transaction]
+  [CommissionStrategy]
+  [FixedCommissionStrategy]
+}
+
+package "Servicios Externos" {
+  [ExternalEmailService]
+}
+
+' Relaciones entre servicios y puertos de salida
+[CreateAccountService] --> AccountRepositoryPort
+[CreateAccountService] --> NotificationPort
+
+[CheckBalanceService] --> AccountRepositoryPort
+
+[TransferMoneyService] --> AccountRepositoryPort
+[TransferMoneyService] --> TransactionRepositoryPort
+[TransferMoneyService] --> CommissionStrategy
+
+' Adaptador de correo depende del servicio externo
+[EmailNotificationAdapter] --> [ExternalEmailService]
+
+@enduml

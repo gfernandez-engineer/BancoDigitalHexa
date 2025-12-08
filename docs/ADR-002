@@ -1,0 +1,28 @@
+# ADR-002: Sistema de persistencia (H2 vs MySQL)
+
+## Estado
+Aceptado
+
+## Fecha
+2025-12-08
+
+## Contexto
+El sistema necesita persistir cuentas y transacciones. Durante desarrollo y pruebas se requiere una base ligera y embebida. En producción se necesita un motor robusto y escalable.
+
+## Decisión
+Usar H2 en entornos de desarrollo/pruebas y MySQL en producción.
+
+## Alternativas Consideradas
+1. Solo H2 (rápido, pero limitado en producción)
+2. Solo MySQL (robusto, pero pesado para pruebas)
+3. H2 para pruebas y MySQL para producción - **ELEGIDA**
+
+## Consecuencias
+### Positivas
+- Pruebas rápidas y sin configuración adicional con H2.
+- Escalabilidad y soporte en producción con MySQL.
+- Flexibilidad para cambiar adaptadores de persistencia.
+
+### Negativas
+- Necesidad de mantener dos configuraciones distintas.
+- Riesgo de diferencias de comportamiento entre H2 y MySQL.

@@ -1,0 +1,43 @@
+@startuml
+title Caso de Uso: Transferir Dinero
+
+actor Usuario
+
+participant "ConsoleInputAdapter" as CLI
+participant "TransferMoneyService" as TransferMoney
+participant "AccountRepositoryPort (InMemory)" as AccountRepo
+participant "TransactionRepositoryPort (InMemory)" as TxRepo
+participant "NotificationPort (Console)" as Notifier
+participant "CommissionStrategy" as Commission
+
+note over Usuario: El usuario inicia la operación de transferencia
+
+Usuario -> CLI: Ingresar cuenta origen, cuenta destino, monto
+note right of CLI: El adaptador de entrada traduce la acción\nhacia el caso de uso
+
+CLI -> TransferMoney: transferir(origen, destino, monto)
+
+note right of TransferMoney: El servicio valida cuentas y aplica\nla estrategia de comisión
+
+TransferMoney -> AccountRepo: findByNumeroCuenta(origen)
+AccountRepo --> TransferMoney: Account origen
+
+TransferMoney -> AccountRepo: findByNumeroCuenta(destino)
+AccountRepo --> TransferMoney: Account destino
+
+TransferMoney -> Commission: calcularComision(monto)
+Commission --> TransferMoney: comisión
+
+note left of TransferMoney: Se descuenta el monto + comisión\ny se actualizan las cuentas
+
+TransferMoney -> TxRepo: save(Transaction)
+TxRepo --> TransferMoney: confirmación
+
+TransferMoney -> Notifier: notificar("Transferencia realizada")
+Notifier --> TransferMoney: confirmación
+
+TransferMoney --> CLI: resultado
+CLI --> Usuario: "Transferencia exitosa.\nMonto: X, Comisión: Y"
+
+note over Usuario: El usuario recibe confirmación con detalle
+@enduml
