@@ -1,28 +1,96 @@
-# ADR-002: Sistema de persistencia (H2 vs MySQL)
 
-## Estado
-Aceptado
+# ADR-002 – Selección de Arquitectura Hexagonal para Banco Digital
 
-## Fecha
-2025-12-08
+**Información del Documento**
+- **Título:** Selección de Arquitectura Hexagonal para el Sistema Banco Digital
+- **Estado:** Aceptado
+- **Fecha:** 2025-12-08
+- **Autores:** Giancarlo Fernandez (Arquitecto de Software), Equipo de Desarrollo
+- **Revisores:** Comité Académico, Tech Lead del proyecto
+- **Número ADR:** ADR-002
 
-## Contexto
-El sistema necesita persistir cuentas y transacciones. Durante desarrollo y pruebas se requiere una base ligera y embebida. En producción se necesita un motor robusto y escalable.
+---
 
-## Decisión
-Usar H2 en entornos de desarrollo/pruebas y MySQL en producción.
+## 1. Contexto y Declaración del Problema
+El sistema Banco Digital requiere una arquitectura que permita:
+- Separar la lógica de negocio de dependencias externas (UI, DB, APIs).
+- Facilitar pruebas unitarias e integración sin infraestructura compleja.
+- Soportar cambios futuros en adaptadores (ej. migrar de consola a API REST).
+- Escalabilidad y mantenibilidad a largo plazo.
+- Ejemplificar buenas prácticas de diseño para fines pedagógicos.
 
-## Alternativas Consideradas
-1. Solo H2 (rápido, pero limitado en producción)
-2. Solo MySQL (robusto, pero pesado para pruebas)
-3. H2 para pruebas y MySQL para producción - **ELEGIDA**
+---
 
-## Consecuencias
-### Positivas
-- Pruebas rápidas y sin configuración adicional con H2.
-- Escalabilidad y soporte en producción con MySQL.
-- Flexibilidad para cambiar adaptadores de persistencia.
+## 2. Factores de Decisión
+- Independencia de frameworks.
+- Testabilidad.
+- Flexibilidad para agregar adaptadores.
+- Experiencia del equipo en patrones de diseño.
+- Mantenibilidad y claridad en capas.
+- Transferencia pedagógica (ejemplo de principios SOLID).
 
-### Negativas
-- Necesidad de mantener dos configuraciones distintas.
-- Riesgo de diferencias de comportamiento entre H2 y MySQL.
+---
+
+## 3. Opciones Consideradas
+- **Opción A: Arquitectura Monolítica en Capas (MVC clásico)**
+- **Opción B: Arquitectura Hexagonal (Ports & Adapters)**
+- **Opción C: Microservicios desde el inicio**
+
+---
+
+## 4. Decisión Tomada
+Se selecciona **Arquitectura Hexagonal (Ports & Adapters)** como base del sistema Banco Digital.
+
+---
+
+## 5. Justificación
+- Aísla la lógica de negocio en el dominio.
+- Los casos de uso se exponen mediante puertos, facilitando pruebas y mantenibilidad.
+- Los adaptadores pueden cambiar sin afectar el núcleo.
+- El equipo puede comenzar con consola y luego migrar a REST.
+- Vs MVC: mayor independencia de frameworks.
+- Vs Microservicios: menor complejidad inicial, más adecuado para proyecto académico.
+
+---
+
+## 6. Consecuencias
+**Positivas:**
+- Claridad en responsabilidades y capas.
+- Facilidad para pruebas unitarias y de integración.
+- Flexibilidad para agregar nuevos adaptadores.
+- Ejemplo pedagógico sólido para estudiantes.
+
+**Negativas:**
+- Mayor curva de aprendizaje para quienes no conocen arquitectura hexagonal.
+- Requiere disciplina en separación de capas y respeto de contratos.
+- Puede percibirse como “sobre-ingeniería” en proyectos pequeños.
+
+---
+
+## 7. Implementación
+- **Fase 1:** Definir dominio (`Account`, `Transaction`).
+- **Fase 2:** Implementar puertos (`CreateAccountUseCase`, `TransferMoneyUseCase`, `CheckBalanceUseCase`).
+- **Fase 3:** Implementar adaptadores (`ConsoleInputAdapter`, `PostgreSQLAdapter`).
+- **Fase 4:** Configurar pruebas unitarias sobre casos de uso.
+- **Fase 5:** Documentar con diagramas UML/PUML para reforzar comprensión pedagógica.
+
+**Consideraciones técnicas:**
+- Interfaces para puertos.
+- Adaptadores desacoplados mediante inyección de dependencias.
+- Pruebas unitarias centradas en el dominio.
+- Posible evolución hacia microservicios.
+
+---
+
+## 8. Validación
+- **Métricas de éxito (3 meses):**
+  - 100% de casos de uso probados sin dependencias externas.
+  - Capacidad de reemplazar adaptador de consola por REST sin modificar el dominio.
+  - Tiempo de respuesta < 300ms en operaciones críticas.
+
+- **Criterios de revisión (6 meses):**
+  - Si la arquitectura se vuelve demasiado compleja para el equipo.
+  - Si el rendimiento se ve afectado por exceso de capas.
+  - Si surgen limitaciones críticas para integración con nuevos adaptadores.
+
+- **Plan de contingencia:**

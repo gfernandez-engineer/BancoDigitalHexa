@@ -1,27 +1,115 @@
-# ADR-001: Uso de Arquitectura Hexagonal
+# ADR-001 – Selección de Base de Datos para Sistema Banco Digital
 
-## Estado
-Aceptado
+**Información del Documento**
+- **Título:** Selección de Base de Datos Principal para Sistema Banco Digital
+- **Estado:** Aceptado
+- **Fecha:** 2025-12-08
+- **Autores:** Giancarlo Fernandez (Arquitecto de Software), Equipo de Desarrollo
+- **Revisores:** Comité Académico, Tech Lead del proyecto
+- **Número ADR:** ADR-001
 
-## Fecha
-2025-12-08
+---
 
-## Contexto
-El sistema Banco Digital requiere una arquitectura que permita desacoplar el núcleo de negocio de los detalles tecnológicos. Se busca flexibilidad para intercambiar adaptadores de entrada (consola, REST) y salida (repositorios, notificaciones) sin modificar los casos de uso.
+## 1. Contexto y Declaración del Problema
+El sistema Banco Digital requiere una base de datos que soporte:
+- **Gestión de cuentas y transacciones financieras críticas**, con integridad garantizada.
+- **Sesiones concurrentes de usuarios** (estimado: 5,000 simultáneos).
+- **Consultas rápidas** para operaciones de saldo, transferencias y reportes.
+- **Alta disponibilidad** (mínimo 99.9% uptime).
+- **Flexibilidad en el esquema de datos**, para evolucionar el catálogo de productos y clientes.
+- **Reportes analíticos básicos en tiempo real**, sin afectar el rendimiento de las transacciones.
 
-## Decisión
-Adoptar arquitectura hexagonal (Ports & Adapters) como base del diseño.
+---
 
-## Alternativas Consideradas
-1. Arquitectura en capas tradicional (Controller-Service-Repository)
-2. Arquitectura Hexagonal - **ELEGIDA**
+## 2. Factores de Decisión
+- Consistencia de datos (ACID completo para transacciones financieras).
+- Escalabilidad vertical y horizontal.
+- Rendimiento en consultas complejas.
+- Experiencia del equipo.
+- Costo de licenciamiento.
+- Ecosistema de herramientas de monitoreo y backup.
+- Mantenibilidad.
 
-## Consecuencias
-### Positivas
-- Núcleo de negocio independiente de frameworks y tecnologías externas.
-- Facilidad para intercambiar adaptadores (ej. consola ↔ REST, memoria ↔ BD real).
-- Favorece pruebas unitarias y automatizadas.
+---
 
-### Negativas
-- Mayor complejidad inicial para devcolpers.
-- Requiere disciplina en la separación de paquetes y dependencias.
+## 3. Opciones Consideradas
+- **Opción A: PostgreSQL** – Relacional, open-source, ACID completo, extensiones avanzadas, sin costo.
+- **Opción B: MySQL** – Relacional popular, optimizado para lecturas, amplia comunidad.
+- **Opción C: MongoDB** – NoSQL orientado a documentos, escalabilidad horizontal, flexibilidad de esquema.
+- **Opción D: Oracle Database** – Empresarial, robusto, soporte dedicado, alto costo de licenciamiento.
+
+---
+
+## 4. Decisión Tomada
+Se selecciona **PostgreSQL** como base de datos principal del sistema Banco Digital.
+
+---
+
+## 5. Justificación
+- Garantiza consistencia ACID completa.
+- Soporta JSON nativo para flexibilidad en datos de clientes.
+- Full-text search integrado para búsquedas complejas.
+- Escalabilidad vertical y horizontal con extensiones como **Citus**.
+- Sin costos de licenciamiento.
+- Experiencia previa del equipo.
+- Comunidad activa y documentación extensa.
+
+---
+
+## 6. Consecuencias
+**Positivas:**
+- Ahorro de $50,000–100,000 anuales vs Oracle.
+- Desarrollo inmediato gracias a experiencia previa.
+- Flexibilidad de datos con soporte JSON.
+- Herramientas integradas reducen dependencias externas.
+- Comunidad activa facilita resolución de problemas.
+
+**Negativas:**
+- Dos desarrolladores requieren capacitación en características avanzadas.
+- Escalabilidad horizontal requiere configuración adicional (ej. sharding con Citus).
+- Dependencia de soporte comunitario vs soporte comercial dedicado.
+- Rendimiento en lecturas simples podría ser inferior a MySQL.
+
+---
+
+## 7. Implementación
+- **Fase 1:** Configurar instancia PostgreSQL en desarrollo, esquema inicial, herramientas de administración.
+- **Fase 2:** Configurar ambientes de testing y staging, backup automatizado, monitoreo con Stats Collector.
+- **Fase 3:** Instancia de producción con alta disponibilidad, PgBouncer, replicación master-slave.
+
+**Consideraciones técnicas:**
+- Índices btree para búsquedas numéricas.
+- Índices GIN para JSON.
+- Autovacuum para mantenimiento automático.
+- Particionamiento de tablas de transacciones por fecha.
+
+---
+
+## 8. Validación
+- **Métricas de éxito (3 meses):**
+  - Consultas de saldo < 200ms (percentil 95).
+  - Uptime > 99.9%.
+  - Soporte para 5,000 usuarios concurrentes.
+  - 0 inconsistencias en transacciones financieras.
+
+- **Criterios de revisión (6 meses):**
+  - Si rendimiento cae por debajo de objetivos.
+  - Si costos operacionales exceden 30% del presupuesto.
+  - Si surgen limitaciones críticas para crecimiento del negocio.
+
+- **Plan de contingencia:**
+  - Evaluar arquitectura híbrida (PostgreSQL + Redis para caché).
+  - Considerar sharding horizontal si volumen excede capacidad de una instancia.
+
+---
+
+## Notas Adicionales
+- **Dependencias:** prerequisito para ADR-002 (Arquitectura Hexagonal).
+- **Impacto:** afecta ADR-003 (Estrategia de Caché).
+- **Referencias:** PostgreSQL Performance Tuning Guide, E-commerce Database Best Practices.
+- **Historial de cambios:**
+  - v1.0: Versión inicial aprobada.
+  - v1.1: Métricas de validación agregadas.
+  - v1.2: Mejorada justificación comparativa y plan de contingencia.
+
+---

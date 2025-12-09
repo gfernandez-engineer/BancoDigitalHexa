@@ -1,5 +1,5 @@
 
----
+_---
 
 ##  `/docs/README.md`
 
@@ -31,4 +31,4 @@ Este proyecto aplica varios patrones de diseño y arquitectura:
 - `infrastructure.adapters`: entrada/salida.
 - `external`: servicios externos simulados.
 
-Este diseño facilita pruebas, mantenimiento y extensión del sistema.
+Este diseño facilita pruebas, mantenimiento y extensión del sistema._
