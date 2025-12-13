@@ -44,8 +44,9 @@ package "Servicios Externos" {
 
 [CheckBalanceService] --> AccountRepositoryPort
 
-[TransferMoneyService] --> AccountRepositoryPort
+
 [TransferMoneyService] --> TransactionRepositoryPort
+[TransferMoneyService] --> AccountRepositoryPort
 [TransferMoneyService] --> CommissionStrategy
 
 ' Adaptador de correo depende del servicio externo

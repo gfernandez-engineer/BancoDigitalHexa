@@ -114,7 +114,7 @@ public class ConsoleInputAdapter {
           }
         }
 
-        case 4 -> listarCuentas(); // ✅ aquí llamamos al método
+        case 4 -> listarCuentas();
         case 0 -> salir = true;
         default -> System.out.println("Opcion invalida");
       }

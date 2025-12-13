@@ -8,8 +8,9 @@ import lombok.NoArgsConstructor;
 
 /**
  * Por qué estas propiedades: Identidad: accountId, numeroCuenta facilitan lookup por sistemas
- * distintos. Vínculo: clientId permite notificar al cliente y validar pertenencia. Reglas: saldo,
- * estado son invariantes usados por depositar/retirar/transferir.
+ * distintos.
+ * Vínculo: clientId permite notificar al cliente y validar pertenencia.
+ * Reglas: saldo, estado son invariantes usados por depositar/retirar/transferir.
  * Lombok: @Data, @NoArgsConstructor, @AllArgsConstructor te quitan boilerplate y mantienen foco en
  * reglas.
  */
@@ -62,5 +63,21 @@ public class Account {
   public void cambiarEstado(EstadoCuenta nuevoEstado) {
     this.estado = nuevoEstado;
     this.fechaActualizacion = LocalDateTime.now();
+  }
+
+  public Object getNumeroCuenta() {
+    return this.numeroCuenta;
+  }
+
+  public String getAccountId() {
+    return  this.accountId;
+  }
+
+  public String getClientId() {
+    return  this.clientId;
+  }
+
+  public Double getSaldo() {
+    return this.saldo;
   }
 }
